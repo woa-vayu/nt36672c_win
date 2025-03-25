@@ -32,165 +32,6 @@ WDFTIMER  timerHandle;
 PREPORT_CONTEXT cachedReportContext = NULL;
 DETECTED_OBJECTS objectData;
 
-NTSTATUS
-ReportWakeup(
-	IN PREPORT_CONTEXT ReportContext
-)
-{
-	NTSTATUS status = STATUS_SUCCESS;
-	HID_INPUT_REPORT HidReport;
-
-	RtlZeroMemory(&HidReport, sizeof(HID_INPUT_REPORT));
-
-	HidReport.ReportID = REPORTID_KEYPAD;
-	HidReport.KeyReport.ACBack = ReportContext->ButtonCache.ButtonSlots[0];
-	HidReport.KeyReport.Start = ReportContext->ButtonCache.ButtonSlots[1];
-	HidReport.KeyReport.ACSearch = ReportContext->ButtonCache.ButtonSlots[2];
-	HidReport.KeyReport.SystemPowerDown = 1;
-
-	status = TchSendReport(ReportContext->PingPongQueue, &HidReport);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_REPORTING,
-			"Error sending hid report for wake up (1) - 0x%08lX",
-			status);
-
-		goto exit;
-	}
-
-	RtlZeroMemory(&HidReport, sizeof(HID_INPUT_REPORT));
-
-	HidReport.ReportID = REPORTID_KEYPAD;
-	HidReport.KeyReport.ACBack = ReportContext->ButtonCache.ButtonSlots[0];
-	HidReport.KeyReport.Start = ReportContext->ButtonCache.ButtonSlots[1];
-	HidReport.KeyReport.ACSearch = ReportContext->ButtonCache.ButtonSlots[2];
-	HidReport.KeyReport.SystemPowerDown = 0;
-
-	status = TchSendReport(ReportContext->PingPongQueue, &HidReport);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_REPORTING,
-			"Error sending hid report for wake up (2) - 0x%08lX",
-			status);
-
-		goto exit;
-	}
-
-exit:
-	return status;
-}
-
-NTSTATUS
-ReportKeypad(
-	IN PREPORT_CONTEXT ReportContext,
-	IN BOOLEAN Back,
-	IN BOOLEAN Start,
-	IN BOOLEAN Search
-)
-{
-	NTSTATUS status = STATUS_SUCCESS;
-	HID_INPUT_REPORT HidReport;
-
-	RtlZeroMemory(&HidReport, sizeof(HID_INPUT_REPORT));
-
-	HidReport.ReportID = REPORTID_KEYPAD;
-	HidReport.KeyReport.ACBack = Back;
-	HidReport.KeyReport.Start = Start;
-	HidReport.KeyReport.ACSearch = Search;
-
-	ReportContext->ButtonCache.ButtonSlots[0] = Back;
-	ReportContext->ButtonCache.ButtonSlots[1] = Start;
-	ReportContext->ButtonCache.ButtonSlots[2] = Search;
-	HidReport.KeyReport.SystemPowerDown = 0;
-
-	status = TchSendReport(ReportContext->PingPongQueue, &HidReport);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_REPORTING,
-			"Error sending hid report for keypad - 0x%08lX",
-			status);
-
-		goto exit;
-	}
-
-exit:
-	return status;
-}
-
-NTSTATUS
-ReportPen(
-	IN PREPORT_CONTEXT ReportContext,
-	IN BOOLEAN TipSwitch,
-	IN BOOLEAN BarrelSwitch,
-	IN BOOLEAN Invert,
-	IN BOOLEAN Eraser,
-	IN BOOLEAN InRange,
-	IN USHORT  X,
-	IN USHORT  Y,
-	IN USHORT  TipPressure,
-	IN CHAR  XTilt,
-	IN CHAR  YTilt
-)
-{
-	UNREFERENCED_PARAMETER(TipSwitch);
-
-	NTSTATUS status;
-	HID_INPUT_REPORT HidReport;
-	RtlZeroMemory(&HidReport, sizeof(HID_INPUT_REPORT));
-
-	USHORT ScratchX = (USHORT)X;
-	USHORT ScratchY = (USHORT)Y;
-
-	//
-	// Perform per-platform x/y adjustments to controller coordinates
-	//
-	//there are two of these
-	/*TchTranslateToDisplayCoordinates(
-		&ScratchX,
-		&ScratchY,
-		&ReportContext->Props);*/
-
-	HidReport.ReportID = REPORTID_STYLUS;
-
-	HidReport.PenReport.InRange = InRange;
-	HidReport.PenReport.TipSwitch = !!TipPressure;
-	HidReport.PenReport.Eraser = Eraser;
-	HidReport.PenReport.Invert = Invert;
-	HidReport.PenReport.BarrelSwitch = BarrelSwitch;
-
-	HidReport.PenReport.X = ScratchX;
-	HidReport.PenReport.Y = ScratchY;
-	HidReport.PenReport.TipPressure = TipPressure;
-
-	HidReport.PenReport.XTilt = XTilt;
-	HidReport.PenReport.YTilt = YTilt;
-
-	status = TchSendReport(ReportContext->PingPongQueue, &HidReport);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_REPORTING,
-			"Error sending hid report for active pen - 0x%08lX",
-			status);
-
-		goto exit;
-	}
-
-exit:
-	return status;
-}
-
 VOID
 ReportUpdateLocalObjectCache(
 	IN DETECTED_OBJECTS* Data,
@@ -354,7 +195,6 @@ Return Value:
 	int currentFingerIndex;
 	int fingersToReport = 0;
 	USHORT SctatchX = 0, ScratchY = 0;
-	BOOLEAN HasPen = FALSE;
 
 	//
 	// Process the new touch data by updating our cached state
@@ -392,43 +232,11 @@ Return Value:
 
 		HidReport.TouchReport.ContactCount = (UCHAR)ReportContext->Cache.DownCount;
 
-		HasPen = FALSE;
-
 		for (currentFingerIndex = 0; currentFingerIndex < fingersToReport; currentFingerIndex++)
 		{
 			int currentlyReporting = ReportContext->Cache.DownOrder[TouchesReported];
 
 			OBJECT_INFO info = ReportContext->Cache.Slot[currentlyReporting];
-
-			if (info.status == OBJECT_STATE_PEN_PRESENT_WITH_ERASER ||
-				info.status == OBJECT_STATE_PEN_PRESENT_WITH_TIP)
-			{
-				HasPen = TRUE;
-				ReportContext->PenPresent = TRUE;
-
-				status = ReportPen(
-					ReportContext,
-					TRUE,
-					data.PenBarrelSwitch,
-					info.status == OBJECT_STATE_PEN_PRESENT_WITH_ERASER,
-					info.status == OBJECT_STATE_PEN_PRESENT_WITH_ERASER,
-					TRUE,
-					(USHORT)info.x,
-					(USHORT)info.y,
-					data.PenPressure,
-					data.PenTiltX,
-					data.PenTiltY);
-				if (!NT_SUCCESS(status))
-				{
-					Trace(
-						TRACE_LEVEL_ERROR,
-						TRACE_REPORTING,
-						"Error sending hid report for passive pen - 0x%08lX",
-						status);
-
-					goto exit;
-				}
-			}
 
 			HidReport.TouchReport.Contacts[currentFingerIndex].ContactID = (UCHAR)currentlyReporting;
 			SctatchX = (USHORT)info.x;
@@ -453,34 +261,6 @@ Return Value:
 			TouchesReported++;
 		}
 
-		if (HasPen == FALSE && ReportContext->PenPresent == TRUE)
-		{
-			ReportContext->PenPresent = FALSE;
-
-			status = ReportPen(
-				ReportContext,
-				FALSE,
-				FALSE,
-				FALSE,
-				FALSE,
-				FALSE,
-				0,
-				0,
-				0,
-				0,
-				0);
-
-			if (!NT_SUCCESS(status))
-			{
-				Trace(
-					TRACE_LEVEL_ERROR,
-					TRACE_REPORTING,
-					"Error sending hid report for passive pen - 0x%08lX",
-					status);
-
-				goto exit;
-			}
-		}
 	}
 
 	status = TchSendReport(ReportContext->PingPongQueue, &HidReport);

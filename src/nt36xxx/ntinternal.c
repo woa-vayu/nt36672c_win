@@ -140,15 +140,6 @@ Return Value:
     unsigned int ppos = 0;
     int i = 0;
     
-    unsigned char pen_format_id = 0;
-    unsigned short pen_x = 0;
-    unsigned short pen_y = 0;
-    unsigned short pen_pressure = 0;
-    //unsigned short pen_distance = 0;
-    char pen_tilt_x = 0;
-    char pen_tilt_y = 0;
-    unsigned char pen_btn1 = 0;
-
     unsigned short max_x = 1080, max_y = 2400;
 
     status = SpbReadDataSynchronously(SpbContext, 0, point, sizeof(point), TRUE);
@@ -185,12 +176,7 @@ Return Value:
                 obj->tm = 1;
 
             obj->z = point[ppos + 5];
-            // if (i < 2) {
-            // 	obj->z += point[i + 63] << 8;
-            // 	if (obj->z > TOUCH_MAX_PRESSURE)
-            // 		obj->z = TOUCH_MAX_PRESSURE;
-            // }
-
+ 
             Data->States[input_id-1] = OBJECT_STATE_FINGER_PRESENT_WITH_ACCURATE_POS;
 
             Trace(
@@ -202,42 +188,6 @@ Return Value:
             Data->Positions[input_id-1].X = obj->x;
             Data->Positions[input_id-1].Y = obj->y;
             //printf("x:%d y:%d point:%d\n", (int)obj->x, (int)obj->y, finger_cnt);
-        }
-    }
-    
-    pen_format_id = point[65];
-    if (pen_format_id != 0xFF) {
-        if (pen_format_id == 0x01) {
-            pen_x = (point[66] << 8) + point[67];
-            pen_y = (point[68] << 8) + point[69];
-            if (pen_x >= max_x * 2 - 1) {
-                pen_x -= 1;
-            }
-            if (pen_y >= max_y * 2 - 1) {
-                pen_y -= 1;
-            }
-            pen_pressure = (point[70] << 8) + point[71];
-            pen_tilt_x = point[72];
-            pen_tilt_y = point[73];
-            //pen_distance = (point[74] << 8) + point[75];
-            pen_btn1 = point[76] & 0x01;
-            //pen_btn2 = (unsigned int)((point[76] >> 1) & 0x01);
-            
-            //Data->States[10] = OBJECT_STATE_PEN_PRESENT_WITH_TIP;
-            Data->States[10] = OBJECT_STATE_PEN_PRESENT_WITH_TIP;
-
-            Trace(
-                TRACE_LEVEL_ERROR,
-                TRACE_INTERRUPT,
-                "PEN x: %d, y:%d, pressure:%d, tilt_x:%d, tilt_y:%d, btn1:%d",
-                pen_x, pen_y, pen_pressure, pen_tilt_x, pen_tilt_y, pen_btn1);
-
-            Data->PenPressure = pen_pressure;
-            Data->Positions[10].X = pen_x;
-            Data->Positions[10].Y = pen_y;
-            Data->PenTiltX = pen_tilt_x;
-            Data->PenTiltY = pen_tilt_y;
-            Data->PenBarrelSwitch = pen_btn1;
         }
     }
 
@@ -309,22 +259,6 @@ Ft5xServiceInterrupts(
       TchServiceObjectInterrupts(ControllerContext, SpbContext, ReportContext);
 
       return status;
-}
-
-NTSTATUS
-Ft5xSetReportingFlagsF12(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR NewMode,
-    OUT UCHAR* OldMode
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-      UNREFERENCED_PARAMETER(NewMode);
-      UNREFERENCED_PARAMETER(OldMode);
-
-      return STATUS_SUCCESS;
 }
 
 NTSTATUS

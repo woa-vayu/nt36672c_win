@@ -116,7 +116,6 @@ static TOUCH_SCREEN_SETTINGS gDefaultTouchSettings =
     0x0,
     0x0,
     0x0,
-    0x0,
     0x3C,
     0x32,
     0x32,
@@ -330,14 +329,6 @@ RTL_QUERY_REGISTRY_TABLE gRegistryTable[] =
         (PVOID)(FIELD_OFFSET(TOUCH_SCREEN_SETTINGS, ChargerDetectionSupported)),
         REG_DWORD,
         &gDefaultTouchSettings.ChargerDetectionSupported,
-        sizeof(UINT32)
-    },
-    {
-        NULL, RTL_QUERY_REGISTRY_DIRECT,
-        L"ActivePenSupported",
-        (PVOID)(FIELD_OFFSET(TOUCH_SCREEN_SETTINGS, ActivePenSupported)),
-        REG_DWORD,
-        &gDefaultTouchSettings.ActivePenSupported,
         sizeof(UINT32)
     },
     {

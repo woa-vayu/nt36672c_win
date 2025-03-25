@@ -181,33 +181,23 @@ TchPowerSettingCallback(
             }
 
             if (NT_SUCCESS(RtlReadRegistryValue(
-                (PCWSTR)L"\\Registry\\Machine\\SOFTWARE\\OEM\\Nokia\\Touch\\WakeupGesture",
+                (PCWSTR)L"\\Registry\\Machine\\SOFTWARE\\OEM\\Xiaomi\\Touch\\WakeupGesture",
                 (PCWSTR)L"Enabled",
                 REG_DWORD,
                 &GestureEnabled,
                 sizeof(DWORD))) && GestureEnabled == 1)
             {
-                status = Ft5xSetReportingFlagsF12(
-                    ControllerContext,
-                    SpbContext,
-                    FT5X_F12_REPORTING_WAKEUP_GESTURE_MODE,
-                    NULL
-                );
-
-                if (!NT_SUCCESS(status))
-                {
-                    Trace(
-                        TRACE_LEVEL_ERROR,
-                        TRACE_POWER,
-                        "Error Changing Reporting Mode for F12 - 0x%08lX",
-                        status);
-                    goto exit;
-                }
-            }
-            /*else {
-                //Write command to enter "deep sleep mode" if wake up gesture is disabled
+                //Write command to enter "wakeup gesture mode"
+                unsigned char buf[1] = { 0 };
+                buf[0] = 0x13;
                 SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
-            }*/
+            }
+            else {
+                //Write command to enter "deep sleep mode" if wake up gesture is disabled
+                unsigned char buf[1] = { 0 };
+                buf[0] = 0x11;
+                SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
+            }
 
             if (!NT_SUCCESS(status))
             {
@@ -238,7 +228,7 @@ TchPowerSettingCallback(
                 goto exit;
             }
 
-            status = Ft5xSetReportingFlagsF12(
+            /*status = Ft5xSetReportingFlagsF12(
                 ControllerContext,
                 SpbContext,
                 FT5X_F12_REPORTING_CONTINUOUS_MODE,
@@ -253,7 +243,7 @@ TchPowerSettingCallback(
                     "Error Changing Reporting Mode for F12 - 0x%08lX",
                     status);
                 goto exit;
-            }
+            }*/
 
             //Load firmware each time after display turned on
             NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
@@ -400,9 +390,7 @@ Return Value:
     ((PREPORT_CONTEXT)ReportContext)->Cache.SlotValid = 0;
     ((PREPORT_CONTEXT)ReportContext)->Cache.SlotDirty = 0;
     ((PREPORT_CONTEXT)ReportContext)->Cache.DownCount = 0;
-    ((PREPORT_CONTEXT)ReportContext)->ButtonCache.ButtonSlots[0] = 0;
-    ((PREPORT_CONTEXT)ReportContext)->ButtonCache.ButtonSlots[1] = 0;
-    ((PREPORT_CONTEXT)ReportContext)->ButtonCache.ButtonSlots[2] = 0;
+
 
 
     WdfWaitLockRelease(controller->ControllerLock);

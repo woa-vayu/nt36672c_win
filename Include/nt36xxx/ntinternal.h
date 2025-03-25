@@ -41,32 +41,6 @@
 // Ignore warning C4324: 'xxx' : structure was padded due to __declspec(align())
 #pragma warning (disable : 4324)
 
-
-typedef enum _FOCAL_TECH_GESTURE_ID
-{
-      FOCAL_TECH_GESTURE_NONE = 0x00,
-      FOCAL_TECH_GESTURE_MOVE_UP = 0x10,
-      FOCAL_TECH_GESTURE_MOVE_RIGHT = 0x14,
-      FOCAL_TECH_GESTURE_MOVE_DOWN = 0x18,
-      FOCAL_TECH_GESTURE_MOVE_LEFT = 0x1C,
-      FOCAL_TECH_GESTURE_ZOOM_IN = 0x48,
-      FOCAL_TECH_GESTURE_ZOOM_OUT = 0x49
-} FOCAL_TECH_GESTURE_ID;
-
-typedef enum _FOCAL_TECH_DEVICE_MODE
-{
-      FOCAL_TECH_MODE_WORKING = 0,
-      FOCAL_TECH_MODE_TEST = 4
-} FOCAL_TECH_DEVICE_MODE;
-
-typedef enum _FOCAL_TECH_EVENT_FLAG
-{
-      FOCAL_TECH_EVENT_PRESS_DOWN = 0,
-      FOCAL_TECH_EVENT_LIFT_UP = 1,
-      FOCAL_TECH_EVENT_CONTACT = 2,
-      FOCAL_TECH_EVENT_NONE = 3
-} FOCAL_TECH_EVENT_FLAG;
-
 typedef struct _FOCAL_TECH_TOUCH_DATA
 {
 	BYTE PositionX_High : 4;
@@ -119,10 +93,6 @@ typedef struct _RM4_F01_CTRL_REGISTERS_LOGICAL
 
 #define FT5X_MILLISECONDS_TO_TENTH_MILLISECONDS(n) n/10
 #define FT5X_SECONDS_TO_HALF_SECONDS(n) 2*n
-
-//
-// Function $11 - 2-D Touch Sensor
-//
 
 //
 // Logical structure for getting registry config settings
@@ -230,24 +200,6 @@ Ft5xServiceInterrupts(
 
 #define FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_OPERATING  0
 #define FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_SLEEPING   1
-
-#pragma pack(push)
-#pragma pack(1)
-typedef enum _FT5X_F12_REPORTING_FLAGS
-{
-	FT5X_F12_REPORTING_CONTINUOUS_MODE = 0,
-	FT5X_F12_REPORTING_REDUCED_MODE = 1,
-	FT5X_F12_REPORTING_WAKEUP_GESTURE_MODE = 2,
-} FT5X_F12_REPORTING_FLAGS;
-#pragma pack(pop)
-
-NTSTATUS
-Ft5xSetReportingFlagsF12(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR NewMode,
-    OUT UCHAR* OldMode
-);
 
 NTSTATUS
 Ft5xChangeChargerConnectedState(

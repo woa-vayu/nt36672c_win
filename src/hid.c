@@ -31,7 +31,7 @@ const USHORT gOEMVendorID = 0x6674;    // "ft"
 const USHORT gOEMProductID = 0x3578;    // "5x"
 const USHORT gOEMVersionID = 3200;
 
-const PWSTR gpwstrManufacturerID = L"FocalTech";
+const PWSTR gpwstrManufacturerID = L"NovaTek";
 const PWSTR gpwstrProductID = L"5x06";
 const PWSTR gpwstrSerialNumber = L"5x06";
 
@@ -40,14 +40,8 @@ const PWSTR gpwstrSerialNumber = L"5x06";
 //
 
 const UCHAR gReportDescriptor[] = {
-	//FOCALTECH_FT5X_DIGITIZER_DIAGNOSTIC1,
-	//FOCALTECH_FT5X_DIGITIZER_DIAGNOSTIC2,
-	//FOCALTECH_FT5X_DIGITIZER_DIAGNOSTIC3,
-	//FOCALTECH_FT5X_DIGITIZER_DIAGNOSTIC4,
 	FOCALTECH_FT5X_DIGITIZER_FINGER,
 	FOCALTECH_FT5X_DIGITIZER_REPORTMODE,
-	//FOCALTECH_FT5X_DIGITIZER_KEYPAD,
-	FOCALTECH_FT5X_DIGITIZER_STYLUS
 };
 const ULONG gdwcbReportDescriptor = sizeof(gReportDescriptor);
 
@@ -83,34 +77,6 @@ TchSendReport(
 
 	switch (hidReportFromDriver->ReportID)
 	{
-	case REPORTID_STYLUS:
-	{
-	Trace(
-		TRACE_LEVEL_INFORMATION,
-		TRACE_HID,
-		"HID pen: "
-		"Tip Switch = %d, "
-		"Barrel Switch = %d, "
-		"Invert = %d, "
-		"Eraser = %d, "
-		"In Range = %d, "
-		"X = %d, "
-		"Y = %d, "
-		"Tip Pressure = %d, "
-		"X Tilt = %d, "
-		"Y Tilt = %d",
-		hidReportFromDriver->PenReport.TipSwitch,
-		hidReportFromDriver->PenReport.BarrelSwitch,
-		hidReportFromDriver->PenReport.Invert,
-		hidReportFromDriver->PenReport.Eraser,
-		hidReportFromDriver->PenReport.InRange,
-		hidReportFromDriver->PenReport.X,
-		hidReportFromDriver->PenReport.Y,
-		hidReportFromDriver->PenReport.TipPressure,
-		hidReportFromDriver->PenReport.XTilt,
-		hidReportFromDriver->PenReport.YTilt);
-	break;
-	}
 	case REPORTID_FINGER:
 	{
 		Trace(
@@ -144,21 +110,6 @@ TchSendReport(
 			hidReportFromDriver->TouchReport.Contacts[1].X,
 			hidReportFromDriver->TouchReport.Contacts[1].Y);
 		break;
-	}
-	case REPORTID_KEYPAD:
-	{
-		Trace(
-			TRACE_LEVEL_INFORMATION,
-			TRACE_HID,
-			"HID key: "
-			"System Power Down = %d, "
-			"Start = %d, "
-			"AC Search = %d, "
-			"AC Back = %d",
-			hidReportFromDriver->KeyReport.SystemPowerDown,
-			hidReportFromDriver->KeyReport.Start,
-			hidReportFromDriver->KeyReport.ACSearch,
-			hidReportFromDriver->KeyReport.ACBack);
 	}
 	}
 

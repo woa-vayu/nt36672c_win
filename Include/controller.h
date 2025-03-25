@@ -37,7 +37,6 @@ typedef struct _TOUCH_SCREEN_SETTINGS
 	UINT32 ImprovedTouchSupported;
 	UINT32 WakeupGestureSupported;
 	UINT32 ChargerDetectionSupported;
-	UINT32 ActivePenSupported;
 	UINT32 ExtClockControlSupported;
 	UINT32 ForceDriverSupported;
 	UINT32 DoubleTapMaxTapTime10ms;

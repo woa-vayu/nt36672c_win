@@ -222,7 +222,7 @@ Return Value:
 	//
 	// Get Touch settings and populate context
 	//
-	TchGetTouchSettings(&context->TouchSettings);
+	//TchGetTouchSettings(&context->TouchSettings);
 
 	//
 	// Allocate a WDFWAITLOCK for guarding access to the

@@ -460,9 +460,9 @@ OnPrepareHardware(
     //
     // Fetch controller settings from registry
     //
-    status = TchRegistryGetControllerSettings(
-        devContext->TouchContext,
-        devContext->FxDevice);
+    //status = TchRegistryGetControllerSettings(
+    //    devContext->TouchContext,
+    //    devContext->FxDevice);
 
     if (!NT_SUCCESS(status))
     {
