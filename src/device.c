@@ -51,7 +51,7 @@ OnInterruptIsr(
     processing.
 
     This is a PASSIVE_LEVEL ISR. ACPI should specify
-    level-triggered interrupts when using FocalTech 3202.
+    level-triggered interrupts when using NovaTek 3202.
 
   Arguments:
 

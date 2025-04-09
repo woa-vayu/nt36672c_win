@@ -9,7 +9,7 @@
 
 	Abstract:
 
-		Contains FocalTech initialization code
+		Contains NovaTek initialization code
 
 	Environment:
 

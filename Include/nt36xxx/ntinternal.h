@@ -234,3 +234,4 @@ Ft5xConfigureInterruptEnable(
     IN SPB_CONTEXT* SpbContext
 );
 
+#define NVT_UPDATE_FW_ON_RESUME 1

@@ -9,7 +9,7 @@
 
     Abstract:
 
-        Contains FocalTech power-on and power-off functionality
+        Contains NovaTek power-on and power-off functionality
 
     Environment:
 
@@ -245,8 +245,10 @@ TchPowerSettingCallback(
                 goto exit;
             }*/
 
+#if NVT_UPDATE_FW_ON_RESUME
             //Load firmware each time after display turned on
             NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
+#endif
 
             break;
         case 2:
