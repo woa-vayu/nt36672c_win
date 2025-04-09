@@ -509,25 +509,6 @@ OnPrepareHardware(
 
     status = PoRegisterPowerSettingCallback(
         NULL,
-        &GUID_ACDC_POWER_SOURCE,
-        TchPowerSettingCallback,
-        devContext,
-        &devContext->PoFxPowerSettingCallbackHandle1
-    );
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_ERROR,
-            TRACE_INIT,
-            "Error registering power setting callback (1) - 0x%08lX",
-            status);
-
-        goto exit;
-    }
-
-    status = PoRegisterPowerSettingCallback(
-        NULL,
         &GUID_CONSOLE_DISPLAY_STATE,
         TchPowerSettingCallback,
         devContext,

@@ -57,87 +57,7 @@ TchPowerSettingCallback(
     ControllerContext = (FT5X_CONTROLLER_CONTEXT*)devContext->TouchContext;
     SpbContext = &(devContext->I2CContext);
 
-    //
-    // Power Source change
-    //
-    if (IsEqualGUID(&GUID_ACDC_POWER_SOURCE, SettingGuid))
-    {
-        Trace(
-            TRACE_LEVEL_INFORMATION,
-            TRACE_POWER,
-            "Power State Change Notification");
-
-        if (ValueLength != sizeof(DWORD))
-        {
-            Trace(
-                TRACE_LEVEL_ERROR,
-                TRACE_POWER,
-                "TchPowerSettingCallback: Unexpected value size."
-            );
-
-            status = STATUS_INVALID_DEVICE_REQUEST;
-            goto exit;
-        }
-
-        DWORD PowerState = *(DWORD*)Value;
-        switch (PowerState)
-        {
-            // On Battery
-        case PoAc:
-            Trace(
-                TRACE_LEVEL_INFORMATION,
-                TRACE_POWER,
-                "On Battery Power");
-
-            status = Ft5xChangeChargerConnectedState(
-                ControllerContext,
-                SpbContext,
-                0
-            );
-
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error Changing Charger Connected state - 0x%08lX",
-                    status);
-                goto exit;
-            }
-            break;
-            // Plugged In
-        case PoDc:
-        case PoHot:
-            Trace(
-                TRACE_LEVEL_INFORMATION,
-                TRACE_POWER,
-                "On External Power");
-
-            status = Ft5xChangeChargerConnectedState(
-                ControllerContext,
-                SpbContext,
-                1
-            );
-
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error Changing Charger Connected state - 0x%08lX",
-                    status);
-                goto exit;
-            }
-            break;
-        default:
-            Trace(
-                TRACE_LEVEL_ERROR,
-                TRACE_POWER,
-                "Unknown power state - 0x%02X",
-                PowerState);
-        }
-    }
-    else if (IsEqualGUID(&GUID_CONSOLE_DISPLAY_STATE, SettingGuid))
+    if (IsEqualGUID(&GUID_CONSOLE_DISPLAY_STATE, SettingGuid))
     {
         Trace(
             TRACE_LEVEL_INFORMATION,
@@ -187,6 +107,8 @@ TchPowerSettingCallback(
                 &GestureEnabled,
                 sizeof(DWORD))) && GestureEnabled == 1)
             {
+                /* This also requires IRQ Handling to be added later*/
+
                 //Write command to enter "wakeup gesture mode"
                 unsigned char buf[1] = { 0 };
                 buf[0] = 0x13;
@@ -249,6 +171,8 @@ TchPowerSettingCallback(
             //Load firmware each time after display turned on
             NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
 #endif
+
+            /* Display reset(RESX) sequence will be put here */
 
             break;
         case 2:
