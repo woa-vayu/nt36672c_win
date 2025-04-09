@@ -22,6 +22,7 @@
 #include <Cross Platform Shim\compat.h>
 #include <controller.h>
 #include <spb.h>
+#include <device.h>
 #include <nt36xxx\ntinternal.h>
 #include <nt36xxx\ntfwupdate.h>
 #include <internal.h>
@@ -40,6 +41,7 @@ TchPowerSettingCallback(
     PDEVICE_EXTENSION devContext = NULL;
     FT5X_CONTROLLER_CONTEXT* ControllerContext = NULL;
     SPB_CONTEXT* SpbContext = NULL;
+    unsigned char value;
 
     if (Context == NULL)
     {
@@ -78,7 +80,6 @@ TchPowerSettingCallback(
 
         DWORD DisplayState = *(DWORD*)Value;
         DWORD GestureEnabled = 0;
-        //unsigned char buf[1] = { 0x11 };
 
         switch (DisplayState)
         {
@@ -107,7 +108,7 @@ TchPowerSettingCallback(
                 &GestureEnabled,
                 sizeof(DWORD))) && GestureEnabled == 1)
             {
-                /* This also requires IRQ Handling to be added later*/
+                /* enable wakeup irq here*/
 
                 //Write command to enter "wakeup gesture mode"
                 unsigned char buf[1] = { 0 };
@@ -115,6 +116,8 @@ TchPowerSettingCallback(
                 SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
             }
             else {
+                /* disable irq here*/
+
                 //Write command to enter "deep sleep mode" if wake up gesture is disabled
                 unsigned char buf[1] = { 0 };
                 buf[0] = 0x11;
@@ -167,19 +170,17 @@ TchPowerSettingCallback(
                 goto exit;
             }*/
 
+           /* Display reset(RESX) sequence will be put here */
+           
+           value = 1;
+           SetGPIO(devContext->ResetGpio, &value);
+
 #if NVT_UPDATE_FW_ON_RESUME
             //Load firmware each time after display turned on
             NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
 #endif
 
-            /* Display reset(RESX) sequence will be put here */
-
-            break;
-        case 2:
-            Trace(
-                TRACE_LEVEL_INFORMATION,
-                TRACE_POWER,
-                "The Display is Dimmed");
+            /* enable irq here*/
 
             break;
         default:

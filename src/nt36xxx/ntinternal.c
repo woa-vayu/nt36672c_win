@@ -21,6 +21,7 @@
 #include <Cross Platform Shim\compat.h>
 #include <spb.h>
 #include <report.h>
+#include <device.h>
 #include <nt36xxx\ntinternal.h>
 #include <nt36xxx\ntfwupdate.h>
 #include <ntinternal.tmh>
@@ -59,6 +60,7 @@ Ft5xConfigureFunctions(
 {
     FT5X_CONTROLLER_CONTEXT* controller;
     controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+    //unsigned char value;
     
     LARGE_INTEGER delay = { 0 };
 
@@ -66,8 +68,14 @@ Ft5xConfigureFunctions(
     
     delay.QuadPart = RELATIVE(MILLISECONDS(10));
     KeDelayExecutionThread(KernelMode, TRUE, &delay);
+    
+    //value = 0;
+    //SetGPIO(devContext->ResetGpio, &value);
 
     nt36xxx_eng_reset(SpbContext);
+    
+    //value = 1;
+    //SetGPIO(devContext->ResetGpio, &value);
 
     if (nt36xxx_bootloader_reset(SpbContext)) {
         Trace(
@@ -86,7 +94,7 @@ Ft5xConfigureFunctions(
         "TEST READ: %X %X %X %X %X %X %X",
         dataBuffer[0], dataBuffer[1], dataBuffer[2], dataBuffer[3], dataBuffer[4], dataBuffer[5], dataBuffer[6]);
 
-    //NVTLoadFirmwareFile(controller->FxDevice, SpbContext);
+    NVTLoadFirmwareFile(controller->FxDevice, SpbContext);
 
     return STATUS_SUCCESS;
 }

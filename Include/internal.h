@@ -97,8 +97,7 @@ typedef struct _DEVICE_EXTENSION
     //
     // PoFx
     //
-    PVOID PoFxPowerSettingCallbackHandle1;
-    PVOID PoFxPowerSettingCallbackHandle2;
+    PVOID PoFxPowerSettingCallbackHandle;
 
     //
     // Touch Power

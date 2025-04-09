@@ -512,7 +512,7 @@ OnPrepareHardware(
         &GUID_CONSOLE_DISPLAY_STATE,
         TchPowerSettingCallback,
         devContext,
-        &devContext->PoFxPowerSettingCallbackHandle2
+        &devContext->PoFxPowerSettingCallbackHandle
     );
 
     if (!NT_SUCCESS(status))
@@ -564,20 +564,7 @@ OnReleaseHardware(
     devContext = GetDeviceContext(FxDevice);
 
     status = PoUnregisterPowerSettingCallback(
-        devContext->PoFxPowerSettingCallbackHandle1
-    );
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_ERROR,
-            TRACE_INIT,
-            "Error unregistering power setting callback - 0x%08lX",
-            status);
-    }
-
-    status = PoUnregisterPowerSettingCallback(
-        devContext->PoFxPowerSettingCallbackHandle2
+        devContext->PoFxPowerSettingCallbackHandle
     );
 
     if (!NT_SUCCESS(status))

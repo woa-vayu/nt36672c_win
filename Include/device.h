@@ -20,6 +20,8 @@
 
 #pragma once
 
+NTSTATUS
+SetGPIO(WDFIOTARGET gpio, unsigned char* value);
 
 EVT_WDF_DEVICE_D0_ENTRY OnD0Entry;
 
