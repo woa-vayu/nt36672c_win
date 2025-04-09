@@ -9,7 +9,7 @@ This repository has been forked from https://github.com/theR4K/SynapticsTouch fo
 |--------------------------------|-----------------------------------------------------------------------------------|----------------|
 | Touch                          | Requires touch precision tunning, finger detection isn't as accurate as it can be | ✅            |
 | Suspend/Resume                 | Requires a proper Suspend/Resume sequence. Currently it's just workaround in ACPI | ✅            |
-| Wakeup Gesture                 | Most likely possible to get working, needs further testing                        | ❌            |
+| Wakeup Gesture                 | Most likely possible to get working, needs further testing                        | ⚠️           |
 | Multi-Touch                    |                                                                                   | ✅            |
 | Tianma/CSOT Panel detection    |                                                                                   | ✅            |
 | Palm detection                 | Might require Xiaomi Touch features                                               | ❔            |
