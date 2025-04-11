@@ -40,8 +40,7 @@ const PWSTR gpwstrSerialNumber = L"5x06";
 //
 
 const UCHAR gReportDescriptor[] = {
-	FOCALTECH_FT5X_DIGITIZER_FINGER,
-	FOCALTECH_FT5X_DIGITIZER_REPORTMODE,
+	NOVATEK_NT36XXX_DIGITIZER_FINGER,
 };
 const ULONG gdwcbReportDescriptor = sizeof(gReportDescriptor);
 
@@ -239,7 +238,7 @@ Return Value:
 	//
 	if (devContext->ServiceInterruptsAfterD0Entry == TRUE)
 	{
-		Ft5xServiceInterrupts(
+		Nt36xxxServiceInterrupts(
 			devContext->TouchContext,
 			&devContext->I2CContext,
 			&devContext->ReportContext);
@@ -341,12 +340,12 @@ TchGenerateHidReportDescriptor(
 )
 {
 	PDEVICE_EXTENSION devContext;
-	FT5X_CONTROLLER_CONTEXT* touchContext;
+	NT36XXX_CONTROLLER_CONTEXT* touchContext;
 	NTSTATUS status;
 
 	devContext = GetDeviceContext(Device);
 
-	touchContext = (FT5X_CONTROLLER_CONTEXT*)devContext->TouchContext;
+	touchContext = (NT36XXX_CONTROLLER_CONTEXT*)devContext->TouchContext;
 
 	PUCHAR hidReportDescBuffer = (PUCHAR)ExAllocatePoolWithTag(
 		NonPagedPool,
@@ -856,9 +855,9 @@ Return Value:
 		capsReport->MaximumContactPoints = PTP_MAX_CONTACT_POINTS;
 		capsReport->ReportID = REPORTID_DEVICE_CAPS;
 
-		if (devContext->TouchContext != NULL && ((FT5X_CONTROLLER_CONTEXT*)devContext->TouchContext)->MaxFingers != 0)
+		if (devContext->TouchContext != NULL && ((NT36XXX_CONTROLLER_CONTEXT*)devContext->TouchContext)->MaxFingers != 0)
 		{
-			capsReport->MaximumContactPoints = ((FT5X_CONTROLLER_CONTEXT*)devContext->TouchContext)->MaxFingers;
+			capsReport->MaximumContactPoints = ((NT36XXX_CONTROLLER_CONTEXT*)devContext->TouchContext)->MaxFingers;
 		}
 
 		Trace(

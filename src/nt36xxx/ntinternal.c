@@ -28,7 +28,7 @@
 
 NTSTATUS
 Ft5xBuildFunctionsTable(
-      IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext
 )
 {
@@ -40,7 +40,7 @@ Ft5xBuildFunctionsTable(
 
 NTSTATUS
 Ft5xChangePage(
-      IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext,
       IN int DesiredPage
 )
@@ -54,12 +54,12 @@ Ft5xChangePage(
 
 NTSTATUS
 Ft5xConfigureFunctions(
-      IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext
 )
 {
-    FT5X_CONTROLLER_CONTEXT* controller;
-    controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+    NT36XXX_CONTROLLER_CONTEXT* controller;
+    controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
     //unsigned char value;
     
     LARGE_INTEGER delay = { 0 };
@@ -81,7 +81,7 @@ Ft5xConfigureFunctions(
         Trace(
             TRACE_LEVEL_ERROR,
             TRACE_INTERRUPT,
-            "Can't reset the nvt IC");
+            "Failed to reset the Novatek IC");
     }
 
     nt36xxx_set_page(SpbContext, NT36XXX_PAGE_CHIP_INFO);
@@ -135,8 +135,8 @@ Return Value:
 --*/
 {
     NTSTATUS status;
-    FT5X_CONTROLLER_CONTEXT* controller;
-    controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+    NT36XXX_CONTROLLER_CONTEXT* controller;
+    controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
 
     struct nt36xxx_abs_object objd = { 0, 0, 0, 0 };
     struct nt36xxx_abs_object* obj = &objd;
@@ -205,7 +205,7 @@ exit:
 
 NTSTATUS
 TchServiceObjectInterrupts(
-      IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext,
       IN PREPORT_CONTEXT ReportContext
 )
@@ -256,8 +256,8 @@ exit:
 
 
 NTSTATUS
-Ft5xServiceInterrupts(
-      IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+Nt36xxxServiceInterrupts(
+      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext,
       IN PREPORT_CONTEXT ReportContext
 )
@@ -270,48 +270,8 @@ Ft5xServiceInterrupts(
 }
 
 NTSTATUS
-Ft5xChangeChargerConnectedState(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR ChargerConnectedState
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-      UNREFERENCED_PARAMETER(ChargerConnectedState);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
-Ft5xChangeSleepState(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR SleepState
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-      UNREFERENCED_PARAMETER(SleepState);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
-Ft5xGetFirmwareVersion(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
 Ft5xCheckInterrupts(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
     IN SPB_CONTEXT* SpbContext,
     IN ULONG* InterruptStatus
 )
@@ -325,7 +285,7 @@ Ft5xCheckInterrupts(
 
 NTSTATUS
 Ft5xConfigureInterruptEnable(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
     IN SPB_CONTEXT* SpbContext
 )
 {

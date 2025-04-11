@@ -276,10 +276,19 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
     );*/
 
     if (NT_SUCCESS(ntstatus)) {
-        Trace(
-            TRACE_LEVEL_INFORMATION,
-            TRACE_INTERRUPT,
-            "Found: j20s_novatek_ts_fw0x.bin");
+        if (outVar[10] == 0x2a) {
+            Trace(
+                TRACE_LEVEL_INFORMATION,
+                TRACE_INTERRUPT,
+                "Found Huaxing FW");
+        }
+        else {
+            Trace(
+                TRACE_LEVEL_INFORMATION,
+                TRACE_INTERRUPT,
+                "Found Tianma FW");
+        }
+        
 
         byteOffset.QuadPart = 0;
         ntstatus = ZwReadFile(handle, NULL, NULL, NULL, &ioStatusBlock,
@@ -290,7 +299,6 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
     //nvt_bin_header_parser
     static unsigned int partition = 0;
     static unsigned char ilm_dlm_num = 2;
-    static unsigned char cascade_2nd_header_info = 0;
 
     unsigned int list = 0;
     unsigned int pos = 0x00;
@@ -298,30 +306,12 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
     unsigned char info_sec_num = 0;
     unsigned char ovly_sec_num = 0;
     unsigned char ovly_info = 0;
-    unsigned char find_bin_header = 0;
 
     end = buffer[0] + (buffer[1] << 8) + (buffer[2] << 16) + (buffer[3] << 24);
-    cascade_2nd_header_info = (buffer[0x20] & 0x02) >> 1;
-    Trace(
-        TRACE_LEVEL_INFORMATION,
-        TRACE_INTERRUPT,
-        "cascade_2nd_header_info = %d", cascade_2nd_header_info);
-
-    if (cascade_2nd_header_info) {
-        pos = 0x30;	// info section start at 0x30 offset
-        while (pos < (end / 2)) {
-            info_sec_num++;
-            pos += 0x10;	/* each header info is 16 bytes */
-        }
-
-        info_sec_num = info_sec_num + 1; //next header section
-    }
-    else {
-        pos = 0x30;	// info section start at 0x30 offset
-        while (pos < end) {
-            info_sec_num++;
-            pos += 0x10;	/* each header info is 16 bytes */
-        }
+    pos = 0x30;	// info section start at 0x30 offset
+    while (pos < end) {
+        info_sec_num++;
+        pos += 0x10;	/* each header info is 16 bytes */
     }
 
     /*
@@ -353,7 +343,7 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
         Trace(
             TRACE_LEVEL_INFORMATION,
             TRACE_INTERRUPT,
-            "kzalloc for bin_map failed!\n");
+            "Could not allocate bin_map!");
     }
 
     for (list = 0; list < partition; list++) {
@@ -379,14 +369,8 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
          * SRAM_addr : size : BIN_addr : crc (16-bytes)
          */
         if ((list >= ilm_dlm_num) && ((unsigned char)list < (ilm_dlm_num + info_sec_num))) {
-            if (find_bin_header == 0) {
-                /* others partition located at 0x30 offset */
-                pos = 0x30 + (0x10 * (list - ilm_dlm_num));
-            }
-            else if (find_bin_header && cascade_2nd_header_info) {
-                /* cascade 2nd header info */
-                pos = end - 0x10;
-            }
+            /* others partition located at 0x30 offset */
+            pos = 0x30 + (0x10 * (list - ilm_dlm_num));
 
             bin_map[list].SRAM_addr = byte_to_word((unsigned char*)&buffer[pos]);
             bin_map[list].size = byte_to_word((unsigned char*)&buffer[pos + 4]);
@@ -396,7 +380,6 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
             /* detect header end to protect parser function */
             if ((bin_map[list].BIN_addr < end) && (bin_map[list].size != 0)) {
                 sprintf(bin_map[list].name, "Header");
-                find_bin_header = 1;
             }
             else {
                 sprintf(bin_map[list].name, "Info-%d", (list - ilm_dlm_num));

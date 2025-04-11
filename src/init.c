@@ -49,11 +49,11 @@ TchStartDevice(
 
 --*/
 {
-	FT5X_CONTROLLER_CONTEXT* controller;
+	NT36XXX_CONTROLLER_CONTEXT* controller;
 	ULONG interruptStatus;
 	NTSTATUS status;
 
-	controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+	controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
 	interruptStatus = 0;
 	status = STATUS_SUCCESS;
 
@@ -107,23 +107,6 @@ TchStartDevice(
 	}
 
 	//
-	// Read and store the firmware version
-	//
-	status = Ft5xGetFirmwareVersion(
-		ControllerContext,
-		SpbContext);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_INIT,
-			"Could not get FT5X firmware version - 0x%08lX",
-			status);
-		goto exit;
-	}
-
-	//
 	// Clear any pending interrupts
 	//
 	status = Ft5xCheckInterrupts(
@@ -167,11 +150,11 @@ Return Value:
 	NTSTATUS indicating sucess or failure
 --*/
 {
-	FT5X_CONTROLLER_CONTEXT* controller;
+	NT36XXX_CONTROLLER_CONTEXT* controller;
 
 	UNREFERENCED_PARAMETER(SpbContext);
 
-	controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+	controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
 
 	return STATUS_SUCCESS;
 }
@@ -197,12 +180,12 @@ Return Value:
 	NTSTATUS indicating sucess or failure
 --*/
 {
-	FT5X_CONTROLLER_CONTEXT* context;
+	NT36XXX_CONTROLLER_CONTEXT* context;
 	NTSTATUS status;
 	
 	context = ExAllocatePoolWithTag(
 		NonPagedPoolNx,
-		sizeof(FT5X_CONTROLLER_CONTEXT),
+		sizeof(NT36XXX_CONTROLLER_CONTEXT),
 		TOUCH_POOL_TAG);
 
 	if (NULL == context)
@@ -216,7 +199,7 @@ Return Value:
 		goto exit;
 	}
 
-	RtlZeroMemory(context, sizeof(FT5X_CONTROLLER_CONTEXT));
+	RtlZeroMemory(context, sizeof(NT36XXX_CONTROLLER_CONTEXT));
 	context->FxDevice = FxDevice;
 
 	//
@@ -271,9 +254,9 @@ Return Value:
 	NTSTATUS indicating sucess or failure
 --*/
 {
-	FT5X_CONTROLLER_CONTEXT* controller;
+	NT36XXX_CONTROLLER_CONTEXT* controller;
 
-	controller = (FT5X_CONTROLLER_CONTEXT*)ControllerContext;
+	controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
 
 	if (controller != NULL)
 	{

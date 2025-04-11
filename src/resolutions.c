@@ -37,52 +37,29 @@
 
 TOUCH_SCREEN_PROPERTIES gDefaultProperties =
 {
-    0x0,
-    0x0,
-    0x0,
-    TOUCH_DEFAULT_RESOLUTION_X,
-    TOUCH_DEFAULT_RESOLUTION_Y,
-    0x0,
-    TOUCH_DEFAULT_RESOLUTION_X,
-    TOUCH_DEFAULT_RESOLUTION_Y,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    TOUCH_DEFAULT_RESOLUTION_X,
-    TOUCH_DEFAULT_RESOLUTION_Y,
-    0x0,
-    0x0,
-    0x0
+    TOUCH_DEFAULT_RESOLUTION_X, // TouchPhysicalWidth
+    TOUCH_DEFAULT_RESOLUTION_Y, // TouchPhysicalHeight
+    0x0,                        // TouchPhysicalButtonHeight
+    0x0,                        // TouchPillarBoxWidthLeft
+    0x0,                        // TouchPillarBoxWidthRight
+    0x0,                        // TouchLetterBoxHeightTop
+    0x0,                        // TouchLetterBoxHeightBottom
+    TOUCH_DEFAULT_RESOLUTION_X, // DisplayPhysicalWidth
+    TOUCH_DEFAULT_RESOLUTION_Y, // DisplayPhysicalHeight
+    TOUCH_DEFAULT_RESOLUTION_X, // DisplayViewableWidth
+    TOUCH_DEFAULT_RESOLUTION_Y, // DisplayViewableHeight
+    0x0,                        // DisplayPillarBoxWidthLeft
+    0x0,                        // DisplayPillarBoxWidthRight
+    0x0,                        // DisplayLetterBoxHeightTop
+    0x0,                        // DisplayLetterBoxHeightBottom
+    0x0,                        // DisplayHeight10um
+    0x0,                        // DisplayWidth10um
+    0x0                         // TouchHardwareLacksContinuousReporting
 };
 
 
 RTL_QUERY_REGISTRY_TABLE gResParamsRegTable[] =
 {
-    {
-        NULL, RTL_QUERY_REGISTRY_DIRECT,
-        L"TouchSwapAxes",
-        (PVOID)(FIELD_OFFSET(TOUCH_SCREEN_PROPERTIES, TouchSwapAxes)),
-        REG_DWORD,
-        &gDefaultProperties.TouchSwapAxes,
-        sizeof(ULONG)
-    },
-    {
-        NULL, RTL_QUERY_REGISTRY_DIRECT,
-        L"TouchInvertXAxis",
-        (PVOID)(FIELD_OFFSET(TOUCH_SCREEN_PROPERTIES, TouchInvertXAxis)),
-        REG_DWORD,
-        &gDefaultProperties.TouchInvertXAxis,
-        sizeof(ULONG)
-    },
-    {
-        NULL, RTL_QUERY_REGISTRY_DIRECT,
-        L"TouchInvertYAxis",
-        (PVOID)(FIELD_OFFSET(TOUCH_SCREEN_PROPERTIES, TouchInvertYAxis)),
-        REG_DWORD,
-        &gDefaultProperties.TouchInvertYAxis,
-        sizeof(ULONG)
-    },
     {
         NULL, RTL_QUERY_REGISTRY_DIRECT,
         L"TouchPhysicalWidth",
@@ -279,38 +256,6 @@ TchTranslateToDisplayCoordinates(
     //
     X = (ULONG) *PX;
     Y = (ULONG) *PY;
-
-    //
-    // Swap the axes reported by the touch controller if requested
-    //
-    if (Props->TouchSwapAxes)
-    {
-        ULONG temp = Y;
-        Y = X;
-        X = temp;
-    }
-
-    //
-    // Invert the coordinates as requested
-    //
-    if (Props->TouchInvertXAxis)
-    {
-        if (X >= Props->TouchPhysicalWidth)
-        {
-            X = Props->TouchPhysicalWidth - 1u;
-        }
-
-        X = Props->TouchPhysicalWidth - X - 1u;
-    }
-    if (Props->TouchInvertYAxis)
-    {
-        if (Y >= Props->TouchPhysicalHeight)
-        {
-            Y = Props->TouchPhysicalHeight - 1u;
-        }
-
-        Y = Props->TouchPhysicalHeight - Y - 1u;
-    }
 
     //
     // Handle touch clipping boundaries so touch matches

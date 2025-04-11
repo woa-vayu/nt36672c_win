@@ -41,7 +41,7 @@
 // Ignore warning C4324: 'xxx' : structure was padded due to __declspec(align())
 #pragma warning (disable : 4324)
 
-typedef struct _FOCAL_TECH_TOUCH_DATA
+typedef struct _NOVATEK_TOUCH_DATA
 {
 	BYTE PositionX_High : 4;
 	BYTE Reserved0 : 2;
@@ -58,9 +58,9 @@ typedef struct _FOCAL_TECH_TOUCH_DATA
 
 	BYTE Reserved1 : 4;
 	BYTE TouchArea : 4;
-} FOCAL_TECH_TOUCH_DATA, * PFOCAL_TECH_TOUCH_DATA;
+} NOVATEK_TOUCH_DATA, * PNOVATEK_TOUCH_DATA;
 
-typedef struct _FOCAL_TECH_EVENT_DATA
+typedef struct _NOVATEK_EVENT_DATA
 {
 	BYTE Reserved0 : 4;
 	BYTE DeviceMode : 3;
@@ -71,8 +71,8 @@ typedef struct _FOCAL_TECH_EVENT_DATA
 	BYTE NumberOfTouchPoints : 4;
 	BYTE Reserved2 : 4;
 
-	FOCAL_TECH_TOUCH_DATA TouchData[6];
-} FOCAL_TECH_EVENT_DATA, * PFOCAL_TECH_EVENT_DATA;
+	NOVATEK_TOUCH_DATA TouchData[6];
+} NOVATEK_EVENT_DATA, * PNOVATEK_EVENT_DATA;
 
 #define TOUCH_POOL_TAG_F12              (ULONG)'21oT'
 
@@ -149,7 +149,7 @@ typedef struct _FT5X_CONFIGURATION
 	UINT32 PepRemovesVoltageInD3;
 } FT5X_CONFIGURATION;
 
-typedef struct _FT5X_CONTROLLER_CONTEXT
+typedef struct _NT36XXX_CONTROLLER_CONTEXT
 {
 	WDFDEVICE FxDevice;
 	WDFWAITLOCK ControllerLock;
@@ -170,30 +170,30 @@ typedef struct _FT5X_CONTROLLER_CONTEXT
 	BYTE MaxFingers;
 
     int HidQueueCount;
-} FT5X_CONTROLLER_CONTEXT;
+} NT36XXX_CONTROLLER_CONTEXT;
 
 NTSTATUS
 Ft5xBuildFunctionsTable(
-	IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
 	IN SPB_CONTEXT* SpbContext
 );
 
 NTSTATUS
 Ft5xChangePage(
-	IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
 	IN SPB_CONTEXT* SpbContext,
 	IN int DesiredPage
 );
 
 NTSTATUS
 Ft5xConfigureFunctions(
-	IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
 	IN SPB_CONTEXT* SpbContext
 );
 
 NTSTATUS
-Ft5xServiceInterrupts(
-	IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+Nt36xxxServiceInterrupts(
+	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
 	IN SPB_CONTEXT* SpbContext,
 	IN PREPORT_CONTEXT ReportContext
 );
@@ -202,35 +202,15 @@ Ft5xServiceInterrupts(
 #define FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_SLEEPING   1
 
 NTSTATUS
-Ft5xChangeChargerConnectedState(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR ChargerConnectedState
-);
-
-NTSTATUS
-Ft5xChangeSleepState(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN UCHAR SleepState
-);
-
-NTSTATUS
-Ft5xGetFirmwareVersion(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext
-);
-
-NTSTATUS
 Ft5xCheckInterrupts(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
     IN SPB_CONTEXT* SpbContext,
     IN ULONG* InterruptStatus
 );
 
 NTSTATUS
 Ft5xConfigureInterruptEnable(
-    IN FT5X_CONTROLLER_CONTEXT* ControllerContext,
+    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
     IN SPB_CONTEXT* SpbContext
 );
 

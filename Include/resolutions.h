@@ -28,9 +28,6 @@
 
 typedef struct _TOUCH_SCREEN_PROPERTIES
 {
-    UINT32 TouchSwapAxes;
-    UINT32 TouchInvertXAxis;
-    UINT32 TouchInvertYAxis;
     UINT32 TouchPhysicalWidth;
     UINT32 TouchPhysicalHeight;
     UINT32 TouchPhysicalButtonHeight;

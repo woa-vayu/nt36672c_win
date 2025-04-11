@@ -39,7 +39,7 @@ TchPowerSettingCallback(
 {
     NTSTATUS status = STATUS_SUCCESS;
     PDEVICE_EXTENSION devContext = NULL;
-    FT5X_CONTROLLER_CONTEXT* ControllerContext = NULL;
+    NT36XXX_CONTROLLER_CONTEXT* ControllerContext = NULL;
     SPB_CONTEXT* SpbContext = NULL;
     unsigned char value;
 
@@ -56,7 +56,7 @@ TchPowerSettingCallback(
     }
 
     devContext = (PDEVICE_EXTENSION)Context;
-    ControllerContext = (FT5X_CONTROLLER_CONTEXT*)devContext->TouchContext;
+    ControllerContext = (NT36XXX_CONTROLLER_CONTEXT*)devContext->TouchContext;
     SpbContext = &(devContext->I2CContext);
 
     if (IsEqualGUID(&GUID_CONSOLE_DISPLAY_STATE, SettingGuid))
@@ -106,21 +106,29 @@ TchPowerSettingCallback(
                 (PCWSTR)L"Enabled",
                 REG_DWORD,
                 &GestureEnabled,
-                sizeof(DWORD))) && GestureEnabled == 1)
+                sizeof(DWORD))) && GestureEnabled != 1)
             {
+                Trace(
+                    TRACE_LEVEL_INFORMATION,
+                    TRACE_POWER,
+                    "dt2w mode");
                 /* enable wakeup irq here*/
 
                 //Write command to enter "wakeup gesture mode"
                 unsigned char buf[1] = { 0 };
-                buf[0] = 0x13;
+                buf[0] = NT36XXX_CMD_ENTER_WKUP_GESTURE;
                 SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
             }
             else {
+                Trace(
+                    TRACE_LEVEL_INFORMATION,
+                    TRACE_POWER,
+                    "sleep mode");
                 /* disable irq here*/
 
                 //Write command to enter "deep sleep mode" if wake up gesture is disabled
                 unsigned char buf[1] = { 0 };
-                buf[0] = 0x11;
+                buf[0] = NT36XXX_CMD_ENTER_SLEEP;
                 SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
             }
 
@@ -153,22 +161,7 @@ TchPowerSettingCallback(
                 goto exit;
             }
 
-            /*status = Ft5xSetReportingFlagsF12(
-                ControllerContext,
-                SpbContext,
-                FT5X_F12_REPORTING_CONTINUOUS_MODE,
-                NULL
-            );
 
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error Changing Reporting Mode for F12 - 0x%08lX",
-                    status);
-                goto exit;
-            }*/
 
            /* Display reset(RESX) sequence will be put here */
            
@@ -219,10 +212,11 @@ Return Value:
 
 --*/
 {
-    FT5X_CONTROLLER_CONTEXT* controller;
-    NTSTATUS status;
+    UNREFERENCED_PARAMETER(SpbContext);
+    NT36XXX_CONTROLLER_CONTEXT* controller;
+    //NTSTATUS status;
 
-    controller = (FT5X_CONTROLLER_CONTEXT*) ControllerContext;
+    controller = (NT36XXX_CONTROLLER_CONTEXT*) ControllerContext;
 
     //
     // Check if we were already on
@@ -233,23 +227,6 @@ Return Value:
     }
 
     controller->DevicePowerState = PowerDeviceD0;
-
-    //
-    // Attempt to put the controller into operating mode 
-    //
-    status = Ft5xChangeSleepState(
-        controller,
-        SpbContext,
-        FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_OPERATING);
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_ERROR,
-            TRACE_POWER,
-            "Error waking touch controller - 0x%08lX",
-            status);
-    }
 
 exit:
 
@@ -280,10 +257,11 @@ Return Value:
 
 --*/
 {
-    FT5X_CONTROLLER_CONTEXT* controller;
-    NTSTATUS status;
+    UNREFERENCED_PARAMETER(SpbContext);
+    NT36XXX_CONTROLLER_CONTEXT* controller;
+    //NTSTATUS status;
 
-    controller = (FT5X_CONTROLLER_CONTEXT*) ControllerContext;
+    controller = (NT36XXX_CONTROLLER_CONTEXT*) ControllerContext;
 
     //
     // Interrupts are now disabled but the ISR may still be
@@ -295,20 +273,6 @@ Return Value:
     //
     // Put the chip in sleep mode
     //
-    status = Ft5xChangeSleepState(
-        ControllerContext,
-        SpbContext,
-        FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_SLEEPING);
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_ERROR,
-            TRACE_POWER,
-            "Error sleeping touch controller - 0x%08lX",
-            status);
-    }
-
     controller->DevicePowerState = PowerDeviceD3;
 
     //

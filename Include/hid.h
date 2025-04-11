@@ -145,7 +145,7 @@ TchReadReport(
 #define X_MASK 0x38, 0x04 //1080 (0x438)
 #define Y_MASK 0x60, 0x09 //2400 (0x960)
 
-#define FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT \
+#define NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT \
 	BEGIN_COLLECTION, 0x02, /* Collection (Logical) */ \
 		USAGE, 0x42, /* Usage (Tip Switch) */ \
 		LOGICAL_MINIMUM, 0x00, /* Logical Minimum (0) */ \
@@ -173,40 +173,40 @@ TchReadReport(
 		INPUT, 0x02, /* Input: (Data, Var, Abs) */ \
 	END_COLLECTION /* End Collection */
 
-#define FOCALTECH_FT5X_DIGITIZER_FINGER \
+#define NOVATEK_NT36XXX_DIGITIZER_FINGER \
 	USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 	USAGE, 0x04, /* Usage (Touch Screen) */ \
 	BEGIN_COLLECTION, 0x01, /* Collection (Application) */ \
 		REPORT_ID, REPORTID_FINGER, /* Report ID (1) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (1) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (1) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (2) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (2) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (3) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (3) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (4) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (4) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (5) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (5) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (6) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (6) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (7) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (7) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (8) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (8) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (9) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (9) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x22, /* Usage (Finger) */ \
-		FOCALTECH_FT5X_DIGITIZER_FINGER_CONTACT, /* Finger Contact (10) */ \
+		NOVATEK_NT36XXX_DIGITIZER_FINGER_CONTACT, /* Finger Contact (10) */ \
 		USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
 		USAGE, 0x54, /* Usage (Contact Count) */ \
 		REPORT_SIZE, 0x08, /* Report Size (8) */ \
@@ -223,24 +223,6 @@ TchReadReport(
 		REPORT_SIZE, 0x08, \
 		REPORT_COUNT_2, 0x00, 0x01, \
 		FEATURE, 0x02, \
-	END_COLLECTION /* End Collection */
-
-#define FOCALTECH_FT5X_DIGITIZER_REPORTMODE \
-	USAGE_PAGE, 0x0D, /* Usage Page (Digitizer) */ \
-	USAGE, 0x0E, /* Usage (Configuration) */ \
-	BEGIN_COLLECTION, 0x01, /* Collection (Application) */ \
-		REPORT_ID, REPORTID_REPORTMODE, /* Report ID (7) */ \
-		USAGE, 0x22, /* Usage (Finger) */ \
-		BEGIN_COLLECTION, 0x00, /* Collection (Physical) */ \
-			USAGE, 0x52, /* Usage (Input Mode) */ \
-			LOGICAL_MINIMUM, 0x00, /* Logical Minimum (0) */ \
-			LOGICAL_MAXIMUM, 0x0A, /* Logical Maximum (10) */ \
-			REPORT_SIZE, 0x08, /* Report Size (8) */ \
-			REPORT_COUNT, 0x01, /* Report Count (1) */ \
-			FEATURE, 0x02, /* Feature: (Data, Var, Abs) */ \
-			USAGE, 0x53, /* Usage (Device Identifier) */ \
-			FEATURE, 0x02, /* Feature: (Data, Var, Abs) */ \
-		END_COLLECTION, /* End Collection */ \
 	END_COLLECTION /* End Collection */
 
 #define DEFAULT_PTP_HQA_BLOB \

@@ -135,7 +135,7 @@ Return Value:
         status = TchSetFeatureReport(device, Request);
         break;
 
-    case IOCTL_HID_GET_FEATURE:
+   case IOCTL_HID_GET_FEATURE:
         //
         // Returns a feature report associated with a top-level collection
         //

@@ -23,7 +23,6 @@
 #include <controller.h>
 #include <device.h>
 #include <spb.h>
-//#include <FocalTechTouchDriverETW.h>
 #include <idle.h>
 #include <hid.h>
 #include <gpio.h>
@@ -68,12 +67,10 @@ OnInterruptIsr(
     PDEVICE_EXTENSION devContext;
     NTSTATUS status;
 
-    UNREFERENCED_PARAMETER(MessageID);
-
     Trace(
         TRACE_LEVEL_ERROR,
         TRACE_REPORTING,
-        "OnInterruptIsr - Entry");
+        "OnInterruptIsr - Entry: MessageID - %u", MessageID);
 
     status = STATUS_SUCCESS;
     devContext = GetDeviceContext(WdfInterruptGetDevice(Interrupt));
@@ -95,7 +92,7 @@ OnInterruptIsr(
     //
     // Service touch interrupts.
     //
-    status = Ft5xServiceInterrupts(
+    status = Nt36xxxServiceInterrupts(
         devContext->TouchContext,
         &devContext->I2CContext,
         &devContext->ReportContext);
