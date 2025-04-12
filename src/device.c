@@ -76,11 +76,6 @@ OnInterruptIsr(
     devContext = GetDeviceContext(WdfInterruptGetDevice(Interrupt));
 
     //
-    // For performance tracing, write an ETW event marker
-    //
-    //EventWriteTouchIsr(&TouchMiniDriverControlGuid);
-
-    //
     // If we're in diagnostic mode, let the diagnostic application handle
     // interrupt servicing
     //
@@ -457,9 +452,9 @@ OnPrepareHardware(
     //
     // Fetch controller settings from registry
     //
-    //status = TchRegistryGetControllerSettings(
-    //    devContext->TouchContext,
-    //    devContext->FxDevice);
+    status = TchRegistryGetControllerSettings(
+        devContext->TouchContext,
+        devContext->FxDevice);
 
     if (!NT_SUCCESS(status))
     {

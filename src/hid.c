@@ -27,8 +27,8 @@
 #include <hid.h>
 #include <hid.tmh>
 
-const USHORT gOEMVendorID = 0x6674;    // "ft"
-const USHORT gOEMProductID = 0x3578;    // "5x"
+const USHORT gOEMVendorID = 0x6e76;    // "nt"
+const USHORT gOEMProductID = 0x3336;    // "36"
 const USHORT gOEMVersionID = 3200;
 
 const PWSTR gpwstrManufacturerID = L"NovaTek";
