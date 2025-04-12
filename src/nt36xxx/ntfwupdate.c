@@ -15,8 +15,8 @@ struct nvt_ts_bin_map {
 
 static struct nvt_ts_bin_map* bin_map;
 
-//NT36675 memory map
-unsigned int EVENT_BUF_ADDR = 0x22D00;
+//NT36672C memory map
+unsigned int EVENT_BUF_ADDR = 0x21C00;
 /* Phase 2 Host Download */
 unsigned int BOOT_RDY_ADDR = 0x3F10D;
 //unsigned int TX_AUTO_COPY_EN = 0x3F7E8;
