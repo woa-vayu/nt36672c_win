@@ -82,13 +82,13 @@ TchSendReport(
 			TRACE_LEVEL_INFORMATION,
 			TRACE_HID,
 			"HID Finger: "
-			"Contact Count = %d\n"
+			"Contact Count = %d "
 			"Tip Switch = %d, "
 			"In Range = %d, "
 			"Confidence = %d, "
 			"Contact ID = %d, "
 			"X = %d, "
-			"Y = %d\n"
+			"Y = %d "
 			"Tip Switch = %d, "
 			"In Range = %d, "
 			"Confidence = %d, "
