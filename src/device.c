@@ -25,7 +25,6 @@
 #include <spb.h>
 #include <idle.h>
 #include <hid.h>
-#include <gpio.h>
 #include <device.h>
 #include <nt36xxx/ntinternal.h>
 #include <report.h>
@@ -74,15 +73,6 @@ OnInterruptIsr(
 
     status = STATUS_SUCCESS;
     devContext = GetDeviceContext(WdfInterruptGetDevice(Interrupt));
-
-    //
-    // If we're in diagnostic mode, let the diagnostic application handle
-    // interrupt servicing
-    //
-    if (devContext->DiagnosticMode != FALSE)
-    {
-        goto exit;
-    }
 
     //
     // Service touch interrupts.
@@ -146,18 +136,6 @@ Return Value:
             status);
     }
 
-    //
-    // N.B. This FT5X chip's IRQ is level-triggered, but cannot be enabled in
-    //      ACPI until passive-level interrupt handling is added to the driver.
-    //      Service chip in case we missed an edge during D3 or boot-up.
-    //
-    devContext->ServiceInterruptsAfterD0Entry = TRUE;
-
-    //
-    // Complete any pending Idle IRPs
-    //
-    TchCompleteIdleIrp(devContext);
-
     return status;
 }
 
@@ -203,31 +181,6 @@ Return Value:
             "Error exiting D0 - 0x%08lX", 
             status);
     }
-
-    return status;
-}
-
-NTSTATUS GetGPIO(WDFIOTARGET gpio, unsigned char* value)
-{
-    NTSTATUS status = STATUS_SUCCESS;
-    WDF_MEMORY_DESCRIPTOR outputDescriptor;
-
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, value, 1);
-
-    status = WdfIoTargetSendIoctlSynchronously(gpio, NULL, IOCTL_GPIO_READ_PINS, NULL, &outputDescriptor, NULL, NULL);
-
-    return status;
-}
-
-NTSTATUS SetGPIO(WDFIOTARGET gpio, unsigned char* value)
-{
-    NTSTATUS status = STATUS_SUCCESS;
-    WDF_MEMORY_DESCRIPTOR inputDescriptor, outputDescriptor;
-
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDescriptor, value, 1);
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, value, 1);
-
-    status = WdfIoTargetSendIoctlSynchronously(gpio, NULL, IOCTL_GPIO_WRITE_PINS, &inputDescriptor, &outputDescriptor, NULL, NULL);
 
     return status;
 }
@@ -308,8 +261,6 @@ OnPrepareHardware(
     PDEVICE_EXTENSION devContext;
     ULONG resourceCount;
     ULONG i;
-    LARGE_INTEGER delay;
-    unsigned char value;
 
     UNREFERENCED_PARAMETER(FxResourcesRaw);
 
@@ -338,18 +289,6 @@ OnPrepareHardware(
 
             status = STATUS_SUCCESS;
         }
-
-        if (res->Type == CmResourceTypeConnection &&
-            res->u.Connection.Class == CM_RESOURCE_CONNECTION_CLASS_GPIO &&
-            res->u.Connection.Type == CM_RESOURCE_CONNECTION_TYPE_GPIO_IO)
-        {
-            devContext->ResetGpioId.LowPart =
-                res->u.Connection.IdLowPart;
-            devContext->ResetGpioId.HighPart =
-                res->u.Connection.IdHighPart;
-
-            devContext->HasResetGpio = TRUE;
-        }
     }
 
     if (!NT_SUCCESS(status))
@@ -361,39 +300,6 @@ OnPrepareHardware(
             status);
 
         goto exit;
-    }
-
-    if (devContext->HasResetGpio)
-    {
-        status = OpenIOTarget(devContext, devContext->ResetGpioId, GENERIC_READ | GENERIC_WRITE, &devContext->ResetGpio);
-        if (!NT_SUCCESS(status)) {
-            Trace(TRACE_LEVEL_ERROR, TRACE_DRIVER, "OpenIOTarget failed for Reset GPIO 0x%x", status);
-            goto exit;
-        }
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Starting bring up sequence for the controller");
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Setting reset gpio pin to low");
-
-        value = 0;
-        SetGPIO(devContext->ResetGpio, &value);
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Waiting...");
-
-        delay.QuadPart = -10 * TOUCH_POWER_RAIL_STABLE_TIME;
-        KeDelayExecutionThread(KernelMode, TRUE, &delay);
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Setting reset gpio pin to high");
-
-        value = 1;
-        SetGPIO(devContext->ResetGpio, &value);
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Waiting...");
-
-        delay.QuadPart = -10 * TOUCH_DELAY_TO_COMMUNICATE;
-        KeDelayExecutionThread(KernelMode, TRUE, &delay);
-
-        Trace(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Done");
     }
 
     //
@@ -444,24 +350,6 @@ OnPrepareHardware(
             TRACE_LEVEL_ERROR,
             TRACE_INIT,
             "Error allocating touch context - 0x%08lX", 
-            status);
-
-        goto exit;
-    }
-
-    //
-    // Fetch controller settings from registry
-    //
-    status = TchRegistryGetControllerSettings(
-        devContext->TouchContext,
-        devContext->FxDevice);
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_ERROR,
-            TRACE_INIT,
-            "Error retrieving controller settings from registry - 0x%08lX",
             status);
 
         goto exit;

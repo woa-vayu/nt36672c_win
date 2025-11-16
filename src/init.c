@@ -58,23 +58,6 @@ TchStartDevice(
 	status = STATUS_SUCCESS;
 
 	//
-	// Populate context with FT5X function descriptors
-	//
-	status = Ft5xBuildFunctionsTable(
-		ControllerContext,
-		SpbContext);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_INIT,
-			"Could not build table of FT5X functions - 0x%08lX",
-			status);
-		goto exit;
-	}
-
-	//
 	// Initialize FT5X function control registers
 	//
 	status = Ft5xConfigureFunctions(
@@ -90,38 +73,6 @@ TchStartDevice(
 			status);
 
 		goto exit;
-	}
-
-	status = Ft5xConfigureInterruptEnable(
-		ControllerContext,
-		SpbContext);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_INIT,
-			"Could not configure interrupt enablement - 0x%08lX",
-			status);
-		goto exit;
-	}
-
-	//
-	// Clear any pending interrupts
-	//
-	status = Ft5xCheckInterrupts(
-		ControllerContext,
-		SpbContext,
-		&interruptStatus
-	);
-
-	if (!NT_SUCCESS(status))
-	{
-		Trace(
-			TRACE_LEVEL_ERROR,
-			TRACE_INIT,
-			"Could not get interrupt status - 0x%08lX%",
-			status);
 	}
 
 exit:
@@ -201,11 +152,6 @@ Return Value:
 
 	RtlZeroMemory(context, sizeof(NT36XXX_CONTROLLER_CONTEXT));
 	context->FxDevice = FxDevice;
-
-	//
-	// Get Touch settings and populate context
-	//
-	TchGetTouchSettings(&context->TouchSettings);
 
 	//
 	// Allocate a WDFWAITLOCK for guarding access to the

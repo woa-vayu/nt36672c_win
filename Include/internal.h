@@ -48,26 +48,11 @@ typedef struct _DEVICE_EXTENSION
     // Interrupt servicing
     //
     WDFINTERRUPT InterruptObject;
-    BOOLEAN ServiceInterruptsAfterD0Entry;
     
     //
     // Spb (I2C) related members used for the lifetime of the device
     //
     SPB_CONTEXT I2CContext;
-
-    //
-    // Reset GPIO line in case it exists used for power up sequence of the controller
-    //
-    LARGE_INTEGER ResetGpioId;
-    WDFIOTARGET ResetGpio;
-    BOOLEAN HasResetGpio;
-
-    //
-    // Test related
-    //
-    WDFQUEUE TestQueue;
-    volatile LONG TestSessionRefCnt;
-    BOOLEAN DiagnosticMode;
 
     // 
     // Power related
@@ -78,11 +63,6 @@ typedef struct _DEVICE_EXTENSION
     // Touch related members used for the lifetime of the device
     //
     VOID *TouchContext;
-
-    //
-    // Settings
-    //
-    TOUCH_SCREEN_SETTINGS TouchSettings;
 
     //
     // Report

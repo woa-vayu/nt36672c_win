@@ -239,7 +239,6 @@
     <ClCompile Include="..\src\init.c" />
     <ClCompile Include="..\src\power.c" />
     <ClCompile Include="..\src\queue.c" />
-    <ClCompile Include="..\src\registry.c" />
     <ClCompile Include="..\src\resolutions.c" />
     <ClCompile Include="..\src\spb.c" />
     <ClCompile Include="..\src\nt36xxx\ntinternal.c" />

@@ -27,32 +27,6 @@
 #include <ntinternal.tmh>
 
 NTSTATUS
-Ft5xBuildFunctionsTable(
-      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-      IN SPB_CONTEXT* SpbContext
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
-Ft5xChangePage(
-      IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-      IN SPB_CONTEXT* SpbContext,
-      IN int DesiredPage
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-      UNREFERENCED_PARAMETER(DesiredPage);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
 Ft5xConfigureFunctions(
       IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
       IN SPB_CONTEXT* SpbContext
@@ -60,7 +34,7 @@ Ft5xConfigureFunctions(
 {
     NT36XXX_CONTROLLER_CONTEXT* controller;
     controller = (NT36XXX_CONTROLLER_CONTEXT*)ControllerContext;
-    //unsigned char value;
+    NTSTATUS status;
     
     LARGE_INTEGER delay = { 0 };
 
@@ -68,14 +42,8 @@ Ft5xConfigureFunctions(
     
     delay.QuadPart = RELATIVE(MILLISECONDS(10));
     KeDelayExecutionThread(KernelMode, TRUE, &delay);
-    
-    //value = 0;
-    //SetGPIO(devContext->ResetGpio, &value);
 
     nt36xxx_eng_reset(SpbContext);
-    
-    //value = 1;
-    //SetGPIO(devContext->ResetGpio, &value);
 
     if (nt36xxx_bootloader_reset(SpbContext)) {
         Trace(
@@ -94,9 +62,17 @@ Ft5xConfigureFunctions(
         "TEST READ: %X %X %X %X %X %X %X",
         dataBuffer[0], dataBuffer[1], dataBuffer[2], dataBuffer[3], dataBuffer[4], dataBuffer[5], dataBuffer[6]);
 
-    NVTLoadFirmwareFile(controller->FxDevice, SpbContext);
+    if (dataBuffer[3] == 0x3 && dataBuffer[4] == 0x66 && dataBuffer[5] == 0x72 && dataBuffer[6] == 0xc) {
+      Trace(
+        TRACE_LEVEL_INFORMATION,
+        TRACE_INTERRUPT,
+        "Found supported NVT 36672C IC");
+    }
+    else return STATUS_UNSUCCESSFUL;
 
-    return STATUS_SUCCESS;
+    status = NVTLoadFirmwareFile(controller->FxDevice, SpbContext);
+
+    return status;
 }
 
 struct nt36xxx_abs_object {
@@ -267,30 +243,4 @@ Nt36xxxServiceInterrupts(
       TchServiceObjectInterrupts(ControllerContext, SpbContext, ReportContext);
 
       return status;
-}
-
-NTSTATUS
-Ft5xCheckInterrupts(
-    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN ULONG* InterruptStatus
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-      UNREFERENCED_PARAMETER(InterruptStatus);
-
-      return STATUS_SUCCESS;
-}
-
-NTSTATUS
-Ft5xConfigureInterruptEnable(
-    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext
-)
-{
-      UNREFERENCED_PARAMETER(SpbContext);
-      UNREFERENCED_PARAMETER(ControllerContext);
-
-      return STATUS_SUCCESS;
 }

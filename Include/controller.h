@@ -23,17 +23,7 @@
 // Constants
 //
 #define MODE_MULTI_TOUCH                0x02
-#define MAX_TOUCH_COORD                 0x0FFF
 #define FINGER_STATUS                   0x01 // finger down
-
-//
-// Structures
-//
-typedef struct _TOUCH_SCREEN_SETTINGS
-{
-	UINT32 DeviceId;
-	UINT32 WakeupGestureSupported;
-} TOUCH_SCREEN_SETTINGS, * PTOUCH_SCREEN_SETTINGS;
 
 NTSTATUS 
 TchAllocateContext(
@@ -70,26 +60,6 @@ TchWakeDevice(
     IN VOID *ControllerContext,
     IN SPB_CONTEXT *SpbContext
     );
-
-NTSTATUS
-RtlReadRegistryValue(
-    PCWSTR registry_path, 
-    PCWSTR value_name, 
-    ULONG type, 
-    PVOID data, 
-    ULONG length
-    );
-
-NTSTATUS
-TchRegistryGetControllerSettings(
-    IN VOID *ControllerContext,
-    IN WDFDEVICE FxDevice
-    );
-
-VOID
-TchGetTouchSettings(
-	IN PTOUCH_SCREEN_SETTINGS TouchSettings
-);
 
 NTSTATUS
 TchPowerSettingCallback(

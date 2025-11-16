@@ -44,11 +44,5 @@ TchProcessIdleRequest(
     OUT BOOLEAN *Pending
     );
 
-VOID
-TchCompleteIdleIrp(
-    IN PDEVICE_EXTENSION FxDeviceContext
-    );
-
-EVT_WDF_WORKITEM TchIdleIrpWorkitem;
 
 

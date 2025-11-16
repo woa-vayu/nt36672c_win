@@ -41,7 +41,6 @@ TchPowerSettingCallback(
     PDEVICE_EXTENSION devContext = NULL;
     NT36XXX_CONTROLLER_CONTEXT* ControllerContext = NULL;
     SPB_CONTEXT* SpbContext = NULL;
-    unsigned char value;
 
     if (Context == NULL)
     {
@@ -79,7 +78,6 @@ TchPowerSettingCallback(
         }
 
         DWORD DisplayState = *(DWORD*)Value;
-        DWORD GestureEnabled = 0;
 
         switch (DisplayState)
         {
@@ -88,92 +86,22 @@ TchPowerSettingCallback(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_POWER,
                 "The Display is Off");
-
-            status = PowerToggle(&devContext->TouchPowerContext, 0);
-
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error changing touch power state - 0x%08lX",
-                    status);
-                goto exit;
-            }
-
-            if (NT_SUCCESS(RtlReadRegistryValue(
-                (PCWSTR)L"\\Registry\\Machine\\SOFTWARE\\OEM\\Xiaomi\\Touch\\WakeupGesture",
-                (PCWSTR)L"Enabled",
-                REG_DWORD,
-                &GestureEnabled,
-                sizeof(DWORD))) && GestureEnabled != 1)
-            {
-                Trace(
-                    TRACE_LEVEL_INFORMATION,
-                    TRACE_POWER,
-                    "dt2w mode");
-                /* enable wakeup irq here*/
-
-                //Write command to enter "wakeup gesture mode"
-                unsigned char buf[1] = { 0 };
-                buf[0] = NT36XXX_CMD_ENTER_WKUP_GESTURE;
-                SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
-            }
-            else {
-                Trace(
-                    TRACE_LEVEL_INFORMATION,
-                    TRACE_POWER,
-                    "sleep mode");
-                /* disable irq here*/
-
-                //Write command to enter "deep sleep mode" if wake up gesture is disabled
-                unsigned char buf[1] = { 0 };
-                buf[0] = NT36XXX_CMD_ENTER_SLEEP;
-                SpbWriteDataSynchronously(SpbContext, SPI_WRITE_MASK(NT36XXX_EVT_HOST_CMD), buf, 1);
-            }
-
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error Changing Reporting Mode for F12 - 0x%08lX",
-                    status);
-                goto exit;
-            }
-
             break;
         case 1:
             Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_POWER,
                 "The Display is On");
-
-            status = PowerToggle(&devContext->TouchPowerContext, 1);
-
-            if (!NT_SUCCESS(status))
-            {
-                Trace(
-                    TRACE_LEVEL_ERROR,
-                    TRACE_POWER,
-                    "Error changing touch power state - 0x%08lX",
-                    status);
-                goto exit;
-            }
-
-
-
-           /* Display reset(RESX) sequence will be put here */
-           
-           value = 1;
-           SetGPIO(devContext->ResetGpio, &value);
-
 #if NVT_UPDATE_FW_ON_RESUME
             //Load firmware each time after display turned on
-            NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
+            status = NVTLoadFirmwareFile(ControllerContext->FxDevice, SpbContext);
 #endif
-
-            /* enable irq here*/
+            break;
+        case 2:
+            Trace(
+                TRACE_LEVEL_INFORMATION,
+                TRACE_POWER,
+                "The Display is dimmed");
 
             break;
         default:

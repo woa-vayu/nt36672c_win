@@ -54,9 +54,6 @@
     <ClCompile Include="..\src\queue.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\registry.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\resolutions.c">
       <Filter>Source Files</Filter>
     </ClCompile>

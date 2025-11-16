@@ -77,77 +77,8 @@ typedef struct _NOVATEK_EVENT_DATA
 #define TOUCH_POOL_TAG_F12              (ULONG)'21oT'
 
 //
-// Logical structure for getting registry config settings
-//
-typedef struct _RM4_F01_CTRL_REGISTERS_LOGICAL
-{
-	UINT32 SleepMode;
-	UINT32 NoSleep;
-	UINT32 ReportRate;
-	UINT32 Configured;
-	UINT32 InterruptEnable;
-	UINT32 DozeInterval;
-	UINT32 DozeThreshold;
-	UINT32 DozeHoldoff;
-} FT5X_F01_CTRL_REGISTERS_LOGICAL;
-
-#define FT5X_MILLISECONDS_TO_TENTH_MILLISECONDS(n) n/10
-#define FT5X_SECONDS_TO_HALF_SECONDS(n) 2*n
-
-//
-// Logical structure for getting registry config settings
-//
-typedef struct _FT5X_F11_CTRL_REGISTERS_LOGICAL
-{
-	UINT32 ReportingMode;
-	UINT32 AbsPosFilt;
-	UINT32 RelPosFilt;
-	UINT32 RelBallistics;
-	UINT32 Dribble;
-	UINT32 PalmDetectThreshold;
-	UINT32 MotionSensitivity;
-	UINT32 ManTrackEn;
-	UINT32 ManTrackedFinger;
-	UINT32 DeltaXPosThreshold;
-	UINT32 DeltaYPosThreshold;
-	UINT32 Velocity;
-	UINT32 Acceleration;
-	UINT32 SensorMaxXPos;
-	UINT32 SensorMaxYPos;
-	UINT32 ZTouchThreshold;
-	UINT32 ZHysteresis;
-	UINT32 SmallZThreshold;
-	UINT32 SmallZScaleFactor;
-	UINT32 LargeZScaleFactor;
-	UINT32 AlgorithmSelection;
-	UINT32 WxScaleFactor;
-	UINT32 WxOffset;
-	UINT32 WyScaleFactor;
-	UINT32 WyOffset;
-	UINT32 XPitch;
-	UINT32 YPitch;
-	UINT32 FingerWidthX;
-	UINT32 FingerWidthY;
-	UINT32 ReportMeasuredSize;
-	UINT32 SegmentationSensitivity;
-	UINT32 XClipLo;
-	UINT32 XClipHi;
-	UINT32 YClipLo;
-	UINT32 YClipHi;
-	UINT32 MinFingerSeparation;
-	UINT32 MaxFingerMovement;
-} FT5X_F11_CTRL_REGISTERS_LOGICAL;
-
-//
 // Driver structures
 //
-
-typedef struct _FT5X_CONFIGURATION
-{
-	FT5X_F01_CTRL_REGISTERS_LOGICAL DeviceSettings;
-	FT5X_F11_CTRL_REGISTERS_LOGICAL TouchSettings;
-	UINT32 PepRemovesVoltageInD3;
-} FT5X_CONFIGURATION;
 
 typedef struct _NT36XXX_CONTROLLER_CONTEXT
 {
@@ -159,31 +90,12 @@ typedef struct _NT36XXX_CONTROLLER_CONTEXT
 	//
 	DEVICE_POWER_STATE DevicePowerState;
 
-	//
-	// Register configuration programmed to chip
-	//
-	TOUCH_SCREEN_SETTINGS TouchSettings;
-	FT5X_CONFIGURATION Config;
-
 	UCHAR Data1Offset;
 
 	BYTE MaxFingers;
 
     int HidQueueCount;
 } NT36XXX_CONTROLLER_CONTEXT;
-
-NTSTATUS
-Ft5xBuildFunctionsTable(
-	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-	IN SPB_CONTEXT* SpbContext
-);
-
-NTSTATUS
-Ft5xChangePage(
-	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-	IN SPB_CONTEXT* SpbContext,
-	IN int DesiredPage
-);
 
 NTSTATUS
 Ft5xConfigureFunctions(
@@ -196,22 +108,6 @@ Nt36xxxServiceInterrupts(
 	IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
 	IN SPB_CONTEXT* SpbContext,
 	IN PREPORT_CONTEXT ReportContext
-);
-
-#define FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_OPERATING  0
-#define FT5X_F01_DEVICE_CONTROL_SLEEP_MODE_SLEEPING   1
-
-NTSTATUS
-Ft5xCheckInterrupts(
-    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext,
-    IN ULONG* InterruptStatus
-);
-
-NTSTATUS
-Ft5xConfigureInterruptEnable(
-    IN NT36XXX_CONTROLLER_CONTEXT* ControllerContext,
-    IN SPB_CONTEXT* SpbContext
 );
 
 #define NVT_UPDATE_FW_ON_RESUME 1

@@ -370,40 +370,6 @@ TchGetScreenProperties(
 
 --*/
 {
-    ULONG i;
-    PRTL_QUERY_REGISTRY_TABLE regTable;
-    NTSTATUS status;
-
-    regTable = NULL;
-
-    //
-    // Table passed to RtlQueryRegistryValues must be allocated 
-    // from NonPagedPoolNx
-    //
-    regTable = ExAllocatePoolWithTag(
-        NonPagedPoolNx,
-        gcbRegistryTable,
-        TOUCH_POOL_TAG);
-
-    if (regTable == NULL)
-    {
-        return;
-    }
-
-    RtlCopyMemory(
-        regTable,
-        gResParamsRegTable,
-        gcbRegistryTable);
-
-    //
-    // Update offset values with base pointer
-    // 
-    for (i=0; i < gcRegistryTable-1; i++)
-    {
-        regTable[i].EntryContext = (PVOID) (
-            ((SIZE_T) regTable[i].EntryContext) +
-            ((ULONG_PTR) Props));
-    }
 
     //
     // Start with default values
@@ -414,26 +380,7 @@ TchGetScreenProperties(
         sizeof(TOUCH_SCREEN_PROPERTIES));
 
     //
-    // Populate device context with registry overrides (or defaults)
-    //
-    status = RtlQueryRegistryValues(
-        RTL_REGISTRY_ABSOLUTE,
-        TOUCH_SCREEN_PROPERTIES_REG_KEY,
-        regTable,
-        NULL,
-        NULL);
-
-    if (!NT_SUCCESS(status))
-    {
-        Trace(
-            TRACE_LEVEL_WARNING,
-            TRACE_REGISTRY,
-            "Error retrieving registry configuration - 0x%08lX",
-            status);
-    }
-
-    //
-    // Sanity check values provided from the registry
+    // Sanity check values
     //
 
     if (Props->TouchPillarBoxWidthLeft + 
@@ -447,12 +394,6 @@ TchGetScreenProperties(
             Props->TouchPillarBoxWidthLeft,
             Props->TouchPillarBoxWidthRight,
             Props->TouchPhysicalWidth);
-
-        Props->TouchPillarBoxWidthLeft = 
-            gDefaultProperties.TouchPillarBoxWidthLeft;
-        Props->TouchPillarBoxWidthRight = 
-            gDefaultProperties.TouchPillarBoxWidthRight;
-
     }
 
     if (Props->TouchLetterBoxHeightTop + 
@@ -466,15 +407,5 @@ TchGetScreenProperties(
             Props->TouchLetterBoxHeightTop,
             Props->TouchLetterBoxHeightBottom,
             Props->TouchPhysicalHeight);
-
-        Props->TouchLetterBoxHeightTop = 
-            gDefaultProperties.TouchLetterBoxHeightTop;
-        Props->TouchLetterBoxHeightBottom = 
-            gDefaultProperties.TouchLetterBoxHeightBottom;
-    }
-
-    if (regTable != NULL)
-    {
-        ExFreePoolWithTag(regTable, TOUCH_POOL_TAG);
     }
 }

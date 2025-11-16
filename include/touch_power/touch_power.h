@@ -39,10 +39,4 @@ PowerDeInitialize(
     WDFDEVICE Device
 );
 
-NTSTATUS
-PowerToggle(
-    TOUCH_POWER_CONTEXT* deviceContext,
-    DWORD State
-);
-
 DRIVER_NOTIFICATION_CALLBACK_ROUTINE PowerIoRegPnPNotification;

@@ -202,7 +202,7 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
 
     ntstatus = ExGetFirmwareEnvironmentVariable(&efiVar, &efiGUID, &outVar, &outVarLen, NULL);
     if (NT_SUCCESS(ntstatus)) {
-        if(outVar[10] == 0x2a) {
+        if(outVar[10] == 32) {
             RtlInitUnicodeString(&NVTFWFilePathKey, L"NVTFWImagePathHuaxing");
         }
         else {
@@ -276,17 +276,17 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
     );*/
 
     if (NT_SUCCESS(ntstatus)) {
-        if (outVar[10] == 0x2a) {
+        if (outVar[10] == 32) {
             Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_INTERRUPT,
-                "Found Huaxing FW");
+                "Loading Huaxing FW");
         }
         else {
             Trace(
                 TRACE_LEVEL_INFORMATION,
                 TRACE_INTERRUPT,
-                "Found Tianma FW");
+                "Loading Tianma FW");
         }
         
 
@@ -294,6 +294,13 @@ NVTLoadFirmwareFile(WDFDEVICE FxDevice, SPB_CONTEXT* SpbContext) {
         ntstatus = ZwReadFile(handle, NULL, NULL, NULL, &ioStatusBlock,
             buffer, FWBUFFER_SIZE, &byteOffset, NULL);
         ZwClose(handle);
+    }
+    else {
+        Trace(
+                TRACE_LEVEL_INFORMATION,
+                TRACE_INTERRUPT,
+                "Failed to load FW");
+        return STATUS_UNSUCCESSFUL;
     }
 
     //nvt_bin_header_parser
